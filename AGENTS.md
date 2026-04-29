@@ -1,235 +1,360 @@
-# London & Oxford 2026 - Travel Itinerary Website
+# London & Oxford 2026 – Reiseplaner Website
 
-A static single-page website for planning and organizing a 4-day trip to London and Oxford (April 30 - May 3, 2026).
+Eine statische Single-Page-Website zur Planung und Organisation einer 4-tägigen Reise nach London und Oxford (30. April – 3. Mai 2026).
 
-## Project Overview
+## Projektübersicht
 
-This is a **pure static HTML website** for three travelers (Marion, Markus, Martin) visiting London and Oxford. The site serves as a digital travel companion with day-by-day itinerary, restaurant reservations, interactive checklists, and backup plans.
+Dies ist eine **rein statische HTML-Website** für drei Reisende (Marion, Markus, Martin). Die Seite dient als digitaler Reisebegleiter mit tagesgenauem Programm, Restaurantkontakten, interaktiven Checklisten und Backup-Plänen.
 
-**Language:** German (all content is in German)  
-**Domain:** london.danicek.at  
-**Target Date:** April 30 - May 3, 2026
+**Sprache:** Deutsch (gesamter Inhalt ist auf Deutsch)  
+**Domain:** london.danicek.at (konfiguriert in `CNAME`)  
+**Zielzeitraum:** 30. April – 3. Mai 2026  
+**Hosting:** Statisch (GitHub Pages oder ähnlich)
 
-## Technology Stack
+## Technologie-Stack
 
-| Component | Technology |
-|-----------|------------|
-| Structure | HTML5 (single file) |
-| Styling | CSS3 with CSS Custom Properties (variables) |
-| Logic | Vanilla JavaScript (ES6) |
-| Fonts | Google Fonts (Fraunces + Outfit) |
-| Images | External Unsplash URLs (hot-linked) |
-| Hosting | Static (GitHub Pages or similar) |
+| Komponente | Technologie |
+|------------|-------------|
+| Struktur | HTML5 (Single File) |
+| Styling | CSS3 mit CSS Custom Properties |
+| Logik | Vanilla JavaScript (ES6) |
+| Schriften | Google Fonts (Cormorant Garamond, Inter, Playfair Display) |
+| Bilder | Externe Unsplash-URLs (hot-linked) |
+| Karten | OpenStreetMap Embed-Frames |
+| Hosting | Statisch (GitHub Pages) |
 
-**No build tools, no package managers, no dependencies.**
+**Keine Build-Tools, keine Package-Manager, keine Abhängigkeiten.**
 
-## Project Structure
+## Projektstruktur
 
 ```
 .
-├── index.html          # Complete website (HTML + CSS + JS) ~1350 lines
-├── CNAME               # Domain configuration (london.danicek.at)
-└── AGENTS.md           # This file
+├── index.html          # Komplette Website (HTML + CSS + JS) ~2360 Zeilen
+├── manifest.json       # PWA-Manifest
+├── sw.js               # Service Worker für Offline-Unterstützung
+├── CNAME               # Domain-Konfiguration (london.danicek.at)
+├── CLAUDE.md           # Projekt-spezifische Agent-Anweisungen (graphify)
+├── .gitignore          # Git-Ignore (nur .dropbox.attr)
+└── AGENTS.md           # Diese Datei
 ```
 
-The entire application is contained in a single `index.html` file:
-- **Lines 1-762:** CSS styles in `<style>` block
-- **Lines 763-1279:** HTML content
-- **Lines 1280-1346:** JavaScript in `<script>` block
+Die gesamte Anwendung befindet sich in einer einzigen `index.html`:
+- **Zeilen 11–1248:** CSS-Styles im `<style>`-Block
+- **Zeilen 1250–2140:** HTML-Inhalt
+- **Zeilen 2142–2360:** JavaScript im `<script>`-Block
 
-## Architecture
+## Architektur
 
-### 1. Layout Sections
+### 1. Layout-Sektionen (Tab-basierte SPA-Navigation)
 
-The page uses a tab-based SPA (Single Page Application) navigation:
+Die Seite verwendet ein tab-basiertes Navigationssystem:
 
-| Section | ID | Description |
+| Sektion | ID | Beschreibung |
 |---------|-----|-------------|
-| Tagesplan | `#plan` | Day-by-day itinerary (default) |
-| Restaurants | `#restaurants` | All restaurant contacts and links |
-| Checkliste | `#checklist` | Interactive to-do and packing lists |
-| Backup | `#backup` | Alternative plans and useful links |
+| Tagesplan | `#plan` | Tagesgenaues Programm (Standard) |
+| Restaurants | `#restaurants` | Alle Restaurantkontakte und Links |
+| Checkliste | `#checklist` | Interaktive To-Do- und Packlisten |
+| Backup | `#backup` | Alternativpläne und nützliche Links |
 
-### 2. CSS Architecture
+**Navigation:** `showSection(sectionId, btn)` schaltet Sichtbarkeit, aktualisiert aktive Buttons und scrollt sanft zum Navigationsbereich. Beim Wechsel werden Timeline-Animationen neu getriggert.
 
-Uses CSS Custom Properties for theming:
+**Deep-Linking:**
+```javascript
+function showSection(sectionId, btn, skipHistory)
+function handleHash()
+```
+- URL-Hash wird beim Tab-Wechsel aktualisiert (`#plan`, `#restaurants`, `#checklist`, `#backup`)
+- Direkte Links auf einzelne Tabs möglich
+- Browser-Zurück/-Vorwärts funktioniert zwischen Tabs
+- `popstate`-Event-Listener für History-Navigation
+
+### 2. CSS-Architektur
+
+**Farbpalette – British Royal Theme:**
 ```css
---cream: #F5F0E8;           /* Background */
---green: #1B3A2D;           /* Primary brand color */
---gold: #B8860B;            /* Accent color */
---terracotta: #C17850;      /* Secondary accent */
---charcoal: #2C2C2C;        /* Text headings */
---text: #3A3530;            /* Body text */
+--royal-navy: #0A1628;          /* Primäre dunkle Farbe */
+--royal-navy-light: #1A2A42;    /* Sekundäre dunkle Farbe */
+--royal-gold: #C9A962;          /* Akzentfarbe Gold */
+--burgundy: #722F37;            /* Akzentfarbe Burgund */
+--cream: #FAF7F0;               /* Hintergrund */
+--warm-white: #FEFCF8;          /* Karten-Hintergrund */
+--charcoal: #1F1F1F;            /* Überschriften */
+--text-primary: #2D3748;        /* Fließtext */
+--text-secondary: #5A6578;      /* Sekundärer Text */
+--text-muted: #8B95A5;          /* Gedämpfter Text */
 ```
 
-Key CSS patterns:
-- **BEM-like naming:** `.day-card`, `.timeline-item`, `.checklist-text`
-- **Utility classes:** `.tag`, `.btn`, `.priority.high`
-- **Responsive breakpoints:** 768px (tablet), 480px (mobile)
-- **Print styles:** `@media print` hides nav and adjusts colors
+**Wichtige CSS-Patterns:**
+- **BEM-ähnliche Namensgebung:** `.day-card`, `.timeline-item`, `.checklist-text`
+- **Utility-Klassen:** `.tag`, `.btn`, `.priority.high`, `.text-center`, `.mt-2`, `.mb-2`
+- **Responsive Breakpoints:** 768px (Tablet), 480px (Mobile)
+- **Druck-Styles:** `@media print` blendet Navigation und Hero-Bilder aus
+- **Glassmorphism:** Navigation mit `backdrop-filter: blur(20px)`
+- **Parallax-Hero:** Header mit animiertem Hintergrundmuster und Parallax-Effekt
+- **Reduced Motion:** `@media (prefers-reduced-motion: reduce)` deaktiviert Animationen
+- **Live-Mode:** `.current-day` (Gold-Rahmen), `.live-badge` (pulsierendes "Heute"), `.trip-status` (Statusbanner)
 
-### 3. JavaScript Features
+### 3. JavaScript-Features
 
 **Navigation:**
 ```javascript
 function showSection(sectionId, btn)
 ```
-- Switches visible section
-- Updates active nav button state
-- Smooth scroll to navigation
+- Wechselt sichtbare Sektion
+- Aktualisiert aktiven Navigations-Button
+- Sanftes Scrollen zur Navigation
+- Re-triggert Timeline-Animationen via `IntersectionObserver`
 
-**Checklist Persistence:**
+**Checklisten-Persistenz:**
 ```javascript
-function toggleCheck(element)     // Toggle checked state
-function saveChecklist()          // Save to localStorage
-function loadChecklist()          // Restore from localStorage
+function toggleCheck(element)     // Checked-State toggeln
+function saveChecklist()          // Speichert in localStorage
+function loadChecklist()          // Stellt aus localStorage wieder her
 ```
 - Key: `londonChecklist2026`
-- Stores array of boolean values for each checklist item
+- Speichert Array von Boolean-Werten für jedes Checklisten-Element
 
-**Countdown Timer:**
+**Countdown-Timer & Live-Modus:**
 ```javascript
 function updateCountdown()
+function highlightCurrentDay()
 ```
-- Calculates days/hours/minutes until trip start (April 30, 2026 18:25)
-- Updates every 60 seconds
-- Shows "Die Reise hat begonnen!" when trip starts
+- **Vor Reise:** Countdown bis Reisebeginn (30. April 2026, 18:25 Uhr)
+- **Während Reise:** Countdown bis Reiseende (03. Mai 2026, 17:15 Uhr) + Statusbanner
+- **Nach Reise:** "Bis zum nächsten Abenteuer!"
+- Aktualisiert sich alle 60 Sekunden
+- Aktueller Tag wird mit Gold-Rahmen und rotem "Heute"-Badge hervorgehoben (`.current-day`, `.live-badge`)
 
-## Content Organization
+**Parallax-Effekt:**
+```javascript
+function handleParallax()
+```
+- Verschiebt Hero-Bild bei Scroll um 50% der Scroll-Position
 
-### Day Cards Structure
+**Navbar-Scroll-Effekt:**
+```javascript
+function handleNavbar()
+```
+- Fügt Klasse `.scrolled` hinzu, wenn Scroll-Position > 100px
 
-Each day follows this pattern:
+**Timeline-Animationen:**
+```javascript
+function observeTimelineItems()
+```
+- Nutzt `IntersectionObserver` (threshold: 0.1, rootMargin: `0px 0px -50px 0px`)
+- Fügt Klasse `.visible` hinzu, wenn Element in Viewport scrollt
+- Erzeugt Fade-In-Effekt mit horizontaler Verschiebung
+
+**PWA / Offline-Support:**
+```javascript
+// Service Worker Registration
+navigator.serviceWorker.register('sw.js')
+```
+- `manifest.json` für installierbare Web-App
+- `sw.js` cached `index.html` für Offline-Nutzung
+- Favicon als SVG-Data-URI (🇬🇧)
+- Meta-Tags für iOS: `apple-mobile-web-app-capable`, `theme-color`, `apple-mobile-web-app-title`
+- Open Graph Tags für Social Sharing
+
+## Inhaltsorganisation
+
+### Day-Card-Struktur
+
+Jeder Tag folgt diesem Pattern:
 ```html
 <div class="day-card">
     <div class="day-header">
-        <h2 class="day-title">Day Name – Activity</h2>
-        <span class="day-date">Date</span>
+        <h2 class="day-title">Tag – Aktivität</h2>
+        <span class="day-date">Datum</span>
     </div>
     <div class="timeline">
         <div class="timeline-item">
             <div class="timeline-time">HH:MM</div>
-            <div class="timeline-content">...</div>
+            <div class="timeline-content">
+                <img src="..." class="location-image" loading="lazy">
+                <h3>Titel</h3>
+                <p>Beschreibung</p>
+                <span class="tag kategorie">Label</span>
+                <a href="..." class="btn">Button-Text →</a>
+            </div>
         </div>
     </div>
 </div>
 ```
 
-### Tag System
+### Restaurant-Cards
 
-Tags categorize activities:
-- `.food` - Meals and dining
-- `.drink` - Bars, cafes, cocktails
-- `.transport` - Flights, trains, tubes
-- `.highlight` - Special recommendations
+```html
+<div class="restaurant-card">
+    <div class="restaurant-image-container">
+        <img src="..." class="restaurant-image" loading="lazy">
+        <div class="restaurant-image-overlay"></div>
+    </div>
+    <div class="restaurant-content">
+        <h3 class="restaurant-name">Name</h3>
+        <p class="restaurant-type">Kategorie</p>
+        <div class="restaurant-details">...</div>
+        <a href="..." class="btn">Reservieren</a>
+    </div>
+</div>
+```
 
-## Development Guidelines
+### Tag-System
 
-### Making Changes
+Tags kategorisieren Aktivitäten:
+- `.food` – Essen und Dining
+- `.drink` – Bars, Cafés, Cocktails
+- `.transport` – Flüge, Züge, ÖPNV
+- `.highlight` – Besondere Empfehlungen
 
-1. **Edit `index.html` directly** - no build step required
-2. **Test locally** by opening the file in a browser
-3. **Deploy** by pushing to the hosting repository
+### Quick-Links-Bar
 
-### Adding a New Day
+Im Tagesplan befindet sich oberhalb der Day-Cards eine Quick-Links-Bar mit direkten Links zu:
+- TfL Journey Planner
+- Trainline
+- Citymapper
+- BBC Weather
 
-1. Copy an existing `.day-card` block
-2. Update `.day-title` and `.day-date`
-3. Add `.timeline-item` elements for each activity
-4. Use appropriate tags (`.tag`, `.tag.food`, etc.)
-5. For images, use Unsplash URLs with `?w=800` parameter
+### Train-Info-Box
 
-### Adding Checklist Items
+Für Zugverbindungen wird eine spezielle `.train-info`-Box verwendet mit Header, Details-Grid und SVG-Icon.
 
-1. Find the checklist section (`id="checklist"`)
-2. Add a `.checklist-item` div:
+### Notfall- & Reiseinfos (Backup-Tab)
+
+Im Backup-Tab befindet sich eine `.emergency-card` mit:
+- Hotel-Adresse und Telefon
+- Hin- und Rückflugdaten (BA 795 / BA 794)
+- Notrufnummern: **999** (Notfall), **111** (NHS)
+- Österreichische Botschaft London
+- Gestaltet als `.info-grid` mit Icons
+
+## Entwicklungsrichtlinien
+
+### Änderungen vornehmen
+
+1. **`index.html` direkt bearbeiten** – kein Build-Schritt nötig
+2. **Lokal testen** durch Öffnen der Datei im Browser
+3. **Deployen** durch Push in das Hosting-Repository
+
+### Neuen Tag hinzufügen
+
+1. Bestehenden `.day-card`-Block kopieren
+2. `.day-title` und `.day-date` aktualisieren
+3. `.timeline-item`-Elemente für jede Aktivität hinzufügen
+4. Passende Tags verwenden (`.tag`, `.tag.food`, etc.)
+5. Für Bilder Unsplash-URLs mit `?w=800&q=80` verwenden
+6. Für Karten OpenStreetMap-Embed-URLs verwenden
+
+### Checklisten-Items hinzufügen
+
+1. Checklisten-Sektion (`id="checklist"`) finden
+2. `.checklist-item`-Div hinzufügen:
 ```html
 <div class="checklist-item" onclick="toggleCheck(this)">
     <div class="checkbox"></div>
     <div class="checklist-text">
-        <h4>Title</h4>
-        <p>Description</p>
+        <h4>Titel</h4>
+        <p>Beschreibung</p>
     </div>
-    <span class="priority high">Priority Label</span>
+    <span class="priority high">Priorität</span>
 </div>
 ```
-3. Priority classes: `.high`, `.medium`, `.low`
+3. Prioritäts-Klassen: `.high`, `.medium`, `.low`
 
-### Styling Conventions
+### Styling-Konventionen
 
-- **Colors:** Always use CSS variables (`var(--green)` not `#1B3A2D`)
-- **Spacing:** Use rem units (1rem = base font size)
-- **Borders:** 2px radius (subtle rounding)
-- **Shadows:** Use `--shadow` or `--shadow-deep` variables
+- **Farben:** Immer CSS-Variablen verwenden (`var(--royal-navy)` statt `#0A1628`)
+- **Abstände:** rem-Einheiten verwenden
+- **Radien:** 2px–4px (subtiles Rounding)
+- **Schatten:** `--shadow-sm`, `--shadow-md`, `--shadow-lg`, `--shadow-gold` verwenden
+- **Transitions:** `--transition-fast`, `--transition-base`, `--transition-slow`, `--transition-bounce` verwenden
+- **Schriften:** `Playfair Display` für Überschriften, `Inter` für Fließtext, `Cormorant Garamond` für Akzente
 
 ## Deployment
 
-### Current Setup
+### Aktuelles Setup
 
-- **Domain:** london.danicek.at (configured in `CNAME`)
-- **Hosting:** Likely GitHub Pages (repository-based)
-- **SSL:** Automatic (if using GitHub Pages or Cloudflare)
+- **Domain:** london.danicek.at (konfiguriert in `CNAME`)
+- **Hosting:** GitHub Pages (repository-basiert)
+- **SSL:** Automatisch (bei GitHub Pages)
 
-### Deployment Steps
+### Deployment-Schritte
 
-1. Commit changes to repository
-2. Push to main/master branch
-3. Changes are live within minutes
+1. Änderungen committen
+2. Auf main/master-Branch pushen
+3. Änderungen sind innerhalb weniger Minuten live
 
-No CI/CD pipeline, no build artifacts to generate.
+Keine CI/CD-Pipeline, keine Build-Artefakte zu generieren.
 
-## Browser Compatibility
+## Browser-Kompatibilität
 
-Targets modern browsers with:
+Zielt auf moderne Browser ab mit:
 - CSS Grid (`display: grid`)
 - CSS Custom Properties
 - ES6 JavaScript
 - `localStorage` API
+- `IntersectionObserver` API
+- `backdrop-filter` (Glassmorphism)
+- Service Worker API (Offline-Support)
 
-Tested/supported:
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (latest)
-- Mobile browsers (iOS Safari, Chrome Android)
+Getestet/unterstützt:
+- Chrome/Edge (aktuell)
+- Firefox (aktuell)
+- Safari (aktuell)
+- Mobile Browser (iOS Safari, Chrome Android)
 
-## Testing Checklist
+## Test-Checkliste
 
-Before committing changes:
-- [ ] Site loads without console errors
-- [ ] Navigation tabs work correctly
-- [ ] Checklist items toggle and persist (test localStorage)
-- [ ] Countdown displays correctly
-- [ ] Responsive layout works on mobile (320px+)
-- [ ] Print preview shows all sections
-- [ ] External images load (Unsplash URLs valid)
-- [ ] All restaurant reservation links work
+Vor dem Committen:
+- [ ] Seite lädt ohne Konsolen-Fehler
+- [ ] Navigations-Tabs funktionieren korrekt
+- [ ] Checklisten-Items lassen sich abhaken und persistieren (localStorage testen)
+- [ ] Countdown wird korrekt angezeigt
+- [ ] Responsive Layout funktioniert auf Mobile (320px+)
+- [ ] Druckvorschau zeigt alle Sektionen an
+- [ ] Externe Bilder laden (Unsplash-URLs valide)
+- [ ] Alle Restaurant-Reservierungslinks funktionieren
+- [ ] Parallax-Effekt im Hero funktioniert
+- [ ] Timeline-Animationen beim Scrollen sichtbar
+- [ ] Deep-Linking funktioniert (URL-Hash ändert sich beim Tab-Wechsel)
+- [ ] Service Worker registriert sich (DevTools → Application → Service Workers)
+- [ ] Offline: Seite lädt ohne Netzwerk (DevTools → Network → Offline)
+- [ ] Live-Badge erscheint am aktuellen Tag (Datum simulieren zum Testen)
+- [ ] `prefers-reduced-motion` deaktiviert Animationen (Systemeinstellung testen)
 
-## Security Considerations
+## Sicherheitsaspekte
 
-- **No user input** - all content is static
-- **No backend** - no database or server-side code
-- **External resources:** Google Fonts and Unsplash images (HTTPS)
-- **localStorage:** Only stores checklist state, no sensitive data
+- **Keine Benutzereingabe** – gesamter Inhalt ist statisch
+- **Kein Backend** – keine Datenbank oder serverseitiger Code
+- **Externe Ressourcen:** Google Fonts, Unsplash-Bilder und OpenStreetMap-Embed (alle HTTPS)
+- **localStorage:** Speichert nur Checklisten-Status, keine sensiblen Daten
 
-## External Dependencies
+## Externe Abhängigkeiten
 
-| Resource | URL | Purpose |
-|----------|-----|---------|
-| Google Fonts | fonts.googleapis.com | Fraunces & Outfit fonts |
-| Unsplash | images.unsplash.com | Location photos |
+| Ressource | URL | Zweck |
+|-----------|-----|-------|
+| Google Fonts | fonts.googleapis.com | Cormorant Garamond, Inter, Playfair Display |
+| Unsplash | images.unsplash.com | Standortfotos |
+| OpenStreetMap | openstreetmap.org | Eingebettete Karten |
 
-All external resources use HTTPS and have no authentication requirements.
+Alle externen Ressourcen verwenden HTTPS und benötigen keine Authentifizierung.
 
-## Key Dates & Times
+## Wichtige Daten & Zeiten
 
-| Event | Date/Time | Location |
-|-------|-----------|----------|
-| Arrival | April 30, 2026 18:25 | London Heathrow (BA 795) |
-| Hotel Check-in | April 30, 2026 ~21:00 | The Z Hotel Victoria |
-| Mamma Mia Musical | May 1, 2026 19:30 | Novello Theatre |
-| Oxford Day Trip | May 2, 2026 | Christ Church, Punting |
-| Departure | May 3, 2026 17:15 | London Heathrow (BA 794) |
+| Event | Datum/Uhrzeit | Ort |
+|-------|---------------|-----|
+| Ankunft | 30. April 2026, 18:25 | London Heathrow (BA 795) |
+| Hotel Check-in | 30. April 2026, ~21:00 | The Z Hotel Victoria |
+| Mamma Mia Musical | 1. Mai 2026, 19:30 | Novello Theatre |
+| Oxford Tagesausflug | 2. Mai 2026 | Christ Church, Punting |
+| Abreise | 3. Mai 2026, 17:15 | London Heathrow (BA 794) |
+
+## Agent-spezifische Hinweise
+
+### graphify (aus `CLAUDE.md`)
+
+Im Projekt existiert ein `graphify-out/`-Verzeichnis mit Knowledge-Graph-Ausgaben. **Vor jeder Codebase-Frage / Architektur-Analyse / Debugging:** `graphify-out/GRAPH_REPORT.md` lesen. Für gezielte Fragen kann `/graphify query "<frage>"` verwendet werden. Nach Code-Änderungen in einer Session `graphify update .` ausführen (AST-only, kein LLM-Cost).
 
 ---
 
-*Last updated: March 2026*
+*Letzte Aktualisierung: April 2026*

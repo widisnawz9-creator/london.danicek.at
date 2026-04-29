@@ -5,8 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>London & Oxford 2026 | Marion · Markus · Martin</title>
     <meta name="description" content="Reiseplan für London & Oxford - 30. April bis 3. Mai 2026">
+    <meta name="theme-color" content="#0A1628">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="London 2026">
+    <meta property="og:title" content="London & Oxford 2026">
+    <meta property="og:description" content="Reiseplan für London & Oxford – 30. April bis 3. Mai 2026">
+    <meta property="og:type" content="website">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🇬🇧%3C/text%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -1141,6 +1151,142 @@
             .map-container { display: none; }
         }
 
+        /* ===== LIVE MODE ===== */
+        .current-day {
+            border: 2px solid var(--royal-gold);
+            box-shadow: var(--shadow-gold), 0 0 0 1px var(--royal-gold);
+        }
+
+        .current-day::before {
+            width: 6px;
+            background: linear-gradient(180deg, var(--royal-gold) 0%, var(--burgundy) 50%, var(--royal-gold) 100%);
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.25rem 0.7rem;
+            background: var(--burgundy);
+            color: var(--warm-white);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-radius: 2px;
+            margin-left: 0.6rem;
+            vertical-align: middle;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .live-badge::before {
+            content: '';
+            width: 5px;
+            height: 5px;
+            background: #4ade80;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #4ade80;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.75; }
+        }
+
+        .trip-status {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(201, 169, 98, 0.08);
+            border: 1px solid rgba(201, 169, 98, 0.15);
+            border-radius: 4px;
+            margin-bottom: 2rem;
+            font-family: 'Playfair Display', serif;
+            color: var(--royal-navy);
+            font-size: 1.05rem;
+            letter-spacing: 0.02em;
+        }
+
+        .trip-status.ended {
+            background: rgba(10, 22, 40, 0.04);
+            border-color: rgba(10, 22, 40, 0.1);
+            color: var(--text-muted);
+        }
+
+        /* ===== EMERGENCY & INFO CARDS ===== */
+        .emergency-card {
+            background: linear-gradient(135deg, rgba(114, 47, 55, 0.06) 0%, rgba(114, 47, 55, 0.02) 100%);
+            border: 1px solid rgba(114, 47, 55, 0.15);
+            border-radius: 4px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .emergency-card h4 {
+            font-family: 'Playfair Display', serif;
+            color: var(--burgundy);
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.6rem;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .info-item strong {
+            color: var(--royal-navy);
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 0.15rem;
+            font-weight: 600;
+        }
+
+        .info-item svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--burgundy);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .emergency-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--burgundy);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        /* ===== REDUCED MOTION ===== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+            .hero-pattern { animation: none; }
+            .scroll-indicator { animation: none; }
+            .live-badge { animation: none; }
+        }
+
         /* ===== UTILITY ===== */
         .text-center { text-align: center; }
         .mt-2 { margin-top: 2rem; }
@@ -1209,6 +1355,8 @@
                     BBC Weather
                 </a>
             </div>
+
+            <div class="trip-status" id="tripStatus" style="display: none;"></div>
 
             <!-- DAY 1: Donnerstag -->
             <div class="day-card">
@@ -1879,6 +2027,40 @@
                     <h2 class="day-title">Backup-Plan</h2>
                 </div>
                 <p class="section-intro">Falls etwas ausfällt oder ausgebucht ist – hier sind die Alternativen.</p>
+
+                <div class="emergency-card">
+                    <h4>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        Wichtige Reisedaten & Notfallnummern
+                    </h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <div><strong>Hotel</strong>The Z Hotel Victoria<br>5 Lower Belgrave St, SW1W 0NR<br>+44 20 3981 0450</div>
+                        </div>
+                        <div class="info-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16M8 3v18M16 3v18"/></svg>
+                            <div><strong>Hinflug</strong>BA 795 – 30.04., 18:25 Uhr<br>LJU → LHR Terminal 3</div>
+                        </div>
+                        <div class="info-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16M8 3v18M16 3v18"/></svg>
+                            <div><strong>Rückflug</strong>BA 794 – 03.05., 17:15 Uhr<br>LHR Terminal 3 → LJU</div>
+                        </div>
+                        <div class="info-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <div><strong>Notruf</strong><span class="emergency-number">999</span> – Polizei / Feuerwehr / Krankenwagen</div>
+                        </div>
+                        <div class="info-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <div><strong>Ärztlicher Notfall</strong><span class="emergency-number">111</span> – NHS (nicht lebensbedrohlich)</div>
+                        </div>
+                        <div class="info-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>
+                            <div><strong>Botschaft</strong>Österreich in London<br>+44 20 7344 3250<br><a href="https://www.bmeia.gv.at/oeb-london" target="_blank" style="color:var(--royal-navy);text-decoration:none;border-bottom:1px solid var(--royal-gold);">bmeia.gv.at/oeb-london</a></div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="backup-grid">
                     <div class="backup-card">
                         <h4>Falls The Orangery ausgebucht</h4>
@@ -1950,12 +2132,29 @@
     </footer>
 
     <script>
-        // Navigation
-        function showSection(sectionId, btn) {
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+
+        // Navigation with deep-linking
+        function showSection(sectionId, btn, skipHistory) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
-            btn.classList.add('active');
+            
+            if (btn) {
+                btn.classList.add('active');
+            } else {
+                const matchingBtn = document.querySelector(`.nav-btn[onclick*="'${sectionId}'"]`);
+                if (matchingBtn) matchingBtn.classList.add('active');
+            }
+            
+            // Update URL hash without adding to history stack repeatedly
+            if (!skipHistory && window.location.hash !== '#' + sectionId) {
+                history.pushState(null, null, '#' + sectionId);
+            }
+            
             window.scrollTo({ top: document.querySelector('nav').offsetTop - 20, behavior: 'smooth' });
             
             // Re-trigger animations for timeline items
@@ -1966,6 +2165,23 @@
                 observeTimelineItems();
             }, 100);
         }
+
+        // Handle browser back/forward and direct links
+        function handleHash() {
+            const hash = window.location.hash.slice(1);
+            const validSections = ['plan', 'restaurants', 'checklist', 'backup'];
+            if (validSections.includes(hash)) {
+                showSection(hash, null);
+            } else if (!hash) {
+                const defaultBtn = document.querySelector('.nav-btn.active') || document.querySelector('.nav-btn');
+                if (defaultBtn) {
+                    const match = defaultBtn.getAttribute('onclick').match(/showSection\('([^']+)'/);
+                    if (match) showSection(match[1], defaultBtn, true);
+                }
+            }
+        }
+
+        window.addEventListener('popstate', handleHash);
 
         // Checklist with localStorage persistence
         function toggleCheck(element) {
@@ -1988,35 +2204,103 @@
             }
         }
 
-        // Countdown
+        // Live Mode & Countdown
         function updateCountdown() {
-            const tripDate = new Date('2026-04-30T18:25:00');
+            const tripStart = new Date('2026-04-30T18:25:00');
+            const tripEnd = new Date('2026-05-03T17:15:00');
             const now = new Date();
-            const diff = tripDate - now;
+            const countdownEl = document.getElementById('countdown');
+            const statusEl = document.getElementById('tripStatus');
 
-            if (diff <= 0) {
-                document.getElementById('countdown').innerHTML = '<p style="color: var(--royal-gold); font-family: Playfair Display, serif; font-size: 1.3rem; font-style: italic;">Die Reise hat begonnen!</p>';
-                return;
+            if (now >= tripStart && now <= tripEnd) {
+                // During trip – countdown to trip end
+                const diff = tripEnd - now;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                
+                countdownEl.innerHTML = `
+                    <div class="countdown-unit">
+                        <div class="countdown-number">${days}</div>
+                        <div class="countdown-label">Tage</div>
+                    </div>
+                    <div class="countdown-unit">
+                        <div class="countdown-number">${hours}</div>
+                        <div class="countdown-label">Std.</div>
+                    </div>
+                    <div class="countdown-unit">
+                        <div class="countdown-number">${minutes}</div>
+                        <div class="countdown-label">Min.</div>
+                    </div>
+                `;
+                if (statusEl) {
+                    statusEl.innerHTML = '✈️ Die Reise läuft – noch ' + days + ' Tag' + (days !== 1 ? 'e' : '') + ' in London';
+                    statusEl.className = 'trip-status';
+                    statusEl.style.display = 'block';
+                }
+            } else if (now > tripEnd) {
+                // Trip ended
+                countdownEl.innerHTML = '<p style="color: var(--royal-gold); font-family: Playfair Display, serif; font-size: 1.3rem; font-style: italic;">Bis zum nächsten Abenteuer!</p>';
+                if (statusEl) {
+                    statusEl.innerHTML = '✨ Die Reise ist vorbei. Auf ein neues Abenteuer!';
+                    statusEl.className = 'trip-status ended';
+                    statusEl.style.display = 'block';
+                }
+            } else {
+                // Before trip – original countdown
+                const diff = tripStart - now;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                
+                countdownEl.innerHTML = `
+                    <div class="countdown-unit">
+                        <div class="countdown-number">${days}</div>
+                        <div class="countdown-label">Tage</div>
+                    </div>
+                    <div class="countdown-unit">
+                        <div class="countdown-number">${hours}</div>
+                        <div class="countdown-label">Stunden</div>
+                    </div>
+                    <div class="countdown-unit">
+                        <div class="countdown-number">${minutes}</div>
+                        <div class="countdown-label">Minuten</div>
+                    </div>
+                `;
+                if (statusEl) statusEl.style.display = 'none';
             }
+        }
 
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-            document.getElementById('countdown').innerHTML = `
-                <div class="countdown-unit">
-                    <div class="countdown-number">${days}</div>
-                    <div class="countdown-label">Tage</div>
-                </div>
-                <div class="countdown-unit">
-                    <div class="countdown-number">${hours}</div>
-                    <div class="countdown-label">Stunden</div>
-                </div>
-                <div class="countdown-unit">
-                    <div class="countdown-number">${minutes}</div>
-                    <div class="countdown-label">Minuten</div>
-                </div>
-            `;
+        // Highlight current day during trip
+        function highlightCurrentDay() {
+            const tripDates = [
+                { date: '2026-04-30', cardIndex: 0 },
+                { date: '2026-05-01', cardIndex: 1 },
+                { date: '2026-05-02', cardIndex: 2 },
+                { date: '2026-05-03', cardIndex: 3 }
+            ];
+            
+            const now = new Date();
+            const todayStr = now.toISOString().slice(0, 10);
+            const dayCards = document.querySelectorAll('#plan .day-card');
+            
+            tripDates.forEach((tripDay) => {
+                if (tripDay.date === todayStr && dayCards[tripDay.cardIndex]) {
+                    dayCards[tripDay.cardIndex].classList.add('current-day');
+                    const dayHeader = dayCards[tripDay.cardIndex].querySelector('.day-header');
+                    if (dayHeader) {
+                        const badge = document.createElement('span');
+                        badge.className = 'live-badge';
+                        badge.textContent = 'Heute';
+                        const dateSpan = dayHeader.querySelector('.day-date');
+                        if (dateSpan) {
+                            dateSpan.appendChild(badge);
+                        } else {
+                            dayHeader.appendChild(badge);
+                        }
+                    }
+                }
+            });
         }
 
         // Parallax effect for hero
@@ -2057,6 +2341,8 @@
         loadChecklist();
         updateCountdown();
         setInterval(updateCountdown, 60000);
+        highlightCurrentDay();
+        handleHash();
         
         window.addEventListener('scroll', () => {
             handleParallax();
